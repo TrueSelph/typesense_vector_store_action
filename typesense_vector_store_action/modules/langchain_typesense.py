@@ -1,7 +1,9 @@
+"""Module for integrating Typesense as a vector store with LangChain."""
+
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
@@ -55,15 +57,15 @@ class Typesense(VectorStore):
         *,
         typesense_collection_name: Optional[str] = None,
         text_key: str = "text",
-    ):
+    ) -> None:
         """Initialize with Typesense client."""
         try:
             from typesense import Client
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "Could not import typesense python package. "
                 "Please install it with `pip install typesense`."
-            )
+            ) from e
         if not isinstance(typesense_client, Client):
             raise ValueError(
                 f"typesense_client should be an instance of typesense.Client, "
@@ -78,18 +80,20 @@ class Typesense(VectorStore):
 
     @property
     def _collection(self) -> Collection:
+        """Get the Typesense collection."""
         return self._typesense_client.collections[self._typesense_collection_name]
 
     @property
     def embeddings(self) -> Embeddings:
+        """Return the embeddings instance."""
         return self._embedding
 
     def _prep_texts(
         self,
         texts: Iterable[str],
-        metadatas: Optional[List[dict]],
+        metadatas: Optional[List[Dict[str, Any]]],
         ids: Optional[List[str]],
-    ) -> List[dict]:
+    ) -> List[Dict[str, Any]]:
         """Embed and create the documents for Typesense.
 
         Args:
@@ -101,7 +105,7 @@ class Typesense(VectorStore):
             A list of dictionaries representing the documents to be added to Typesense.
         """
         _ids = ids or [str(uuid.uuid4()) for _ in texts]
-        _metadatas: Iterable[dict] = metadatas or [{} for _ in texts]
+        _metadatas: Iterable[Dict[str, Any]] = metadatas or [{} for _ in texts]
         embedded_texts = self._embedding.embed_documents(list(texts))
         return [
             {
@@ -114,10 +118,14 @@ class Typesense(VectorStore):
         ]
 
     def _create_collection(self, num_dim: int) -> None:
+        """Create a Typesense collection with the specified number of dimensions."""
         fields = [
             {"name": "vec", "type": "float[]", "num_dim": num_dim},
             {"name": f"{self._text_key}", "type": "string"},
-            {"name": "metadata", "type": "object"}, # add metadata to schema for filtering compatibility
+            {
+                "name": "metadata",
+                "type": "object",
+            },  # add metadata to schema for filtering compatibility
             {"name": ".*", "type": "auto"},
         ]
         self._typesense_client.collections.create(
@@ -131,7 +139,7 @@ class Typesense(VectorStore):
     def add_texts(
         self,
         texts: Iterable[str],
-        metadatas: Optional[List[dict]] = None,
+        metadatas: Optional[List[Dict[str, Any]]] = None,
         ids: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> List[str]:
@@ -168,11 +176,10 @@ class Typesense(VectorStore):
         Args:
             query: Text to look up documents similar to.
             k: Number of Documents to return. Defaults to 10.
-                Minimum 10 results would be returned.
-            filter: typesense filter_by expression to filter documents on
+            filter: typesense filter_by expression to filter documents on.
 
         Returns:
-            List of Documents most similar to the query and score for each
+            List of Documents most similar to the query and score for each.
         """
         embedded_query = [str(x) for x in self._embedding.embed_query(query)]
         query_obj = {
@@ -185,7 +192,11 @@ class Typesense(VectorStore):
         response = self._typesense_client.multi_search.perform(
             {"searches": [query_obj]}, {}
         )
-        if response["results"] and len(response["results"]) > 0 and "hits" in response["results"][0]:
+        if (
+            response["results"]
+            and len(response["results"]) > 0
+            and "hits" in response["results"][0]
+        ):
             for hit in response["results"][0]["hits"]:
                 document = hit["document"]
                 metadata = document["metadata"]
@@ -206,11 +217,10 @@ class Typesense(VectorStore):
         Args:
             query: Text to look up documents similar to.
             k: Number of Documents to return. Defaults to 10.
-                Minimum 10 results would be returned.
-            filter: typesense filter_by expression to filter documents on
+            filter: typesense filter_by expression to filter documents on.
 
         Returns:
-            List of Documents most similar to the query and score for each
+            List of Documents most similar to the query.
         """
         docs_and_score = self.similarity_search_with_score(query, k=k, filter=filter)
         return [doc for doc, _ in docs_and_score]
@@ -246,11 +256,11 @@ class Typesense(VectorStore):
         """
         try:
             from typesense import Client
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "Could not import typesense python package. "
                 "Please install it with `pip install typesense`."
-            )
+            ) from e
 
         node = {
             "host": host,
@@ -272,7 +282,7 @@ class Typesense(VectorStore):
         cls,
         texts: List[str],
         embedding: Embeddings,
-        metadatas: Optional[List[dict]] = None,
+        metadatas: Optional[List[Dict[str, Any]]] = None,
         ids: Optional[List[str]] = None,
         typesense_client: Optional[Client] = None,
         typesense_client_params: Optional[dict] = None,
