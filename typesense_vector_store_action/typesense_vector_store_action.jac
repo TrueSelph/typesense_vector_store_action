@@ -5,7 +5,8 @@ import:py schedule;
 import:py logging;
 import:py traceback;
 import:py typesense;
-import:py from langchain_community.vectorstores { Typesense }
+import:py from typing { Any }
+import:py from .modules.langchain_typesense { Typesense }
 import:py from langchain_openai { OpenAIEmbeddings }
 import:py from langchain_core.vectorstores.base { VectorStore }
 import:py from langchain_core.documents.base { Document }
@@ -159,7 +160,6 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
             } except yaml.YAMLError as e {
                 importing_error_message = f"Failed to import knode YAML, {e}";
             }
-
 
             if(client := self.get_client()) {
                 for doc in data{
@@ -328,6 +328,35 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         }
 
         return False;
+    }
+
+    can metadata_search(metadata:dict, k:int = 10, **kwargs:Any) -> List[Document] {
+        # Searches the Typesense vector store by metadata and returns search results.
+
+        try {
+
+            # Convert the metadata dictionary into Typesense filter syntax
+            filter_query = " && ".join([f"metadata.{key}:={value}" for (key, value) in metadata.items()]);
+
+            # Perform the search using the generated filter query
+            search_results = self.similarity_search(
+                query="*",
+                filter=filter_query
+            );
+
+            # Log and return the search results
+            if search_results {
+                self.logger.info(f"Search returned {len(search_results)} results for metadata: {metadata}");
+                return search_results;
+            } else {
+                self.logger.info("No results found for the provided metadata.");
+                return [];
+            }
+        } except Exception as e {
+            self.logger.error(f"Exception occurred during metadata search: {str(e)}");
+            self.logger.error(traceback.format_exc());
+            return [];
+        }
     }
 
     can update_document(id:str, data:dict) -> dict {
