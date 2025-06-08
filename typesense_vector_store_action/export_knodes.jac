@@ -8,10 +8,11 @@ import:jac from jivas.agent.action.interact_graph_walker { interact_graph_walker
 
 
 walker export_knodes :interact_graph_walker: {
-    has export_json:bool = False;
-    has embeddings:bool = False;
+
+    has as_json:bool = False;
+    has with_embeddings:bool = False;
+    has with_ids:bool = False;
     has response:str = "";
-    has include_id:bool = False;
 
     # set up logger
     static has logger:Logger = logging.getLogger(__name__);
@@ -25,7 +26,11 @@ walker export_knodes :interact_graph_walker: {
     }
 
     can on_action with Action entry {
-        self.response = here.export_knodes(self.export_json, self.embeddings, self.include_id);
+        self.response = here.export_knodes(
+            as_json=self.as_json,
+            with_embeddings=self.with_embeddings,
+            with_ids=self.with_ids
+        );
     }
 
 }

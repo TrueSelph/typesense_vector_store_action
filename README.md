@@ -6,7 +6,7 @@
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/TrueSelph/typesense_vector_store_action)
 ![GitHub](https://img.shields.io/github/license/TrueSelph/typesense_vector_store_action)
 
-JIVAS action wrapper around the Typesense vector database for retrieval-augmented generation tasks.
+JIVAS action wrapper around the Typesense vector database for retrieval-augmented generation tasks. This action provides integration with the Typesense vector database, supporting retrieval-augmented generation tasks. As a core vector store action, it enables efficient storage, retrieval, and manipulation of vector data within the Typesense ecosystem. Configured as a singleton, it requires the Jivas library version 2.0.0 and the `typesense` Python package version 0.21.0 to function effectively.
 
 ## Package Information
 
@@ -29,8 +29,6 @@ JIVAS action wrapper around the Typesense vector database for retrieval-augmente
 - **Jivas:** `^2.0.0`
 - **Pip:**
   - `typesense`: `0.21.0`
-
-This package, developed by V75 Inc., provides integration with the Typesense vector database, supporting retrieval-augmented generation tasks. As a core vector store action, it enables efficient storage, retrieval, and manipulation of vector data within the Typesense ecosystem. Configured as a singleton, it requires the Jivas library version 2.0.0 and the `typesense` Python package version 0.21.0 to function effectively.
 
 ---
 
@@ -132,4 +130,4 @@ typesense_settings = {
 
 ## 🎗 License
 
-This project is protected under the Apache License 2.0. See [LICENSE](./LICENSE) for more information.
+This project is protected under the Apache License 2.0. See [LICENSE](../LICENSE) for more information.
