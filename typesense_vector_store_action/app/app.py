@@ -6,8 +6,8 @@ from typing import Any, Dict, List
 
 import streamlit as st
 import yaml
-from jvcli.client.lib.utils import call_action_walker_exec, jac_yaml_dumper
-from jvcli.client.lib.widgets import app_controls, app_header, app_update_action
+from jvclient.lib.utils import call_action_walker_exec, jac_yaml_dumper
+from jvclient.lib.widgets import app_controls, app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
 

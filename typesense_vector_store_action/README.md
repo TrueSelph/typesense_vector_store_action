@@ -12,7 +12,7 @@ JIVAS action wrapper around the Typesense vector database for retrieval-augmente
 
 - **Name:** `jivas/typesense_vector_store_action`
 - **Author:** [V75 Inc.](https://v75inc.com/)
-- **Architype:** `TypesenseVectorStoreAction`
+- **archetype:** `TypesenseVectorStoreAction`
 
 ## Meta Information
 
@@ -26,11 +26,11 @@ JIVAS action wrapper around the Typesense vector database for retrieval-augmente
 
 ## Dependencies
 
-- **Jivas:** `^2.0.0`
+- **Jivas:** `^2.1.0`
 - **Pip:**
   - `typesense`: `>=0.21.0`
 
-This package, developed by V75 Inc., provides integration with the Typesense vector database, supporting retrieval-augmented generation tasks. As a core vector store action, it enables efficient storage, retrieval, and manipulation of vector data within the Typesense ecosystem. Configured as a singleton, it requires the Jivas library version 2.0.0 and the `typesense` Python package version 0.21.0 to function effectively.
+This package, developed by V75 Inc., provides integration with the Typesense vector database, supporting retrieval-augmented generation tasks. As a core vector store action, it enables efficient storage, retrieval, and manipulation of vector data within the Typesense ecosystem. Configured as a singleton, it requires the Jivas library version 2.1.0 and the `typesense` Python package version 0.21.0 to function effectively.
 
 ---
 
