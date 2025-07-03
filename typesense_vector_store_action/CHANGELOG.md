@@ -9,3 +9,7 @@
 - Updated for compatibility with updated VectorStoreAction in JIVAS alpha.51
 - Updated to gracefully handle the creation of the collection if it does not exist
 - Improved document listing and editing controls in action app
+
+
+## 0.1.0
+- Updated to support Jivas 2.1.0
