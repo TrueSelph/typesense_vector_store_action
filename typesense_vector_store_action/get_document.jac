@@ -1,9 +1,9 @@
 import from jivas.agent.core.agent { Agent }
 import from jivas.agent.action.action { Action }
 import from jivas.agent.action.actions { Actions }
-import from jivas.agent.action.interact_graph_walker { interact_graph_walker }
+import from jivas.agent.action.agent_graph_walker { agent_graph_walker }
 
-walker get_document(interact_graph_walker) {
+walker get_document(agent_graph_walker) {
 
     has id:str = "";
     has action_label:str = "";
