@@ -9,7 +9,7 @@ walker delete_collection(agent_graph_walker) {
 
     has response:bool = False;
     has reporting:bool = True;
-    
+
     class __specs__ {
         static has private: bool = False;
         static has path: str = action_walker_path(__module__);
