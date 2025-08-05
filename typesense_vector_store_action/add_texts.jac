@@ -1,6 +1,7 @@
 import from jivas.agent.core.agent { Agent }
 import from jivas.agent.action.action { Action }
 import from jivas.agent.action.actions { Actions }
+import from jivas.agent.modules.action.path { action_walker_path }
 import from jivas.agent.action.agent_graph_walker { agent_graph_walker }
 
 
@@ -9,6 +10,12 @@ walker add_texts(agent_graph_walker) {
     has texts:list = [];
     has metadatas:list = [];
     has response:list = [];
+    has reporting:bool = True;
+
+    class __specs__ {
+        static has private: bool = False;
+        static has path: str = action_walker_path(__module__);
+    }
 
     can on_agent with Agent entry {
         visit [-->](`?Actions);
@@ -24,6 +31,10 @@ walker add_texts(agent_graph_walker) {
             texts = self.texts,
             metadatas = self.metadatas
         );
+
+        if self.reporting {
+            report self.response;
+        }
 
     }
 
