@@ -6,8 +6,8 @@ from typing import Any, Dict, List
 
 import streamlit as st
 import yaml
-from jvcli.client.lib.utils import call_action_walker_exec, jac_yaml_dumper
-from jvcli.client.lib.widgets import app_controls, app_header, app_update_action
+from jvclient.lib.utils import call_api, jac_yaml_dumper
+from jvclient.lib.widgets import app_controls, app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
 
@@ -50,8 +50,12 @@ def render(
     params = {
         "page": st.session_state[list_key].get("page", 1),
         "per_page": st.session_state[list_key].get("per_page", 10),
+        "agent_id": agent_id,
     }
-    response = call_action_walker_exec(agent_id, module_root, "list_documents", params)
+    response = call_api(
+        endpoint="action/walker/typesense_vector_store_action/list_documents",
+        json_data=params,
+    )
 
     if response:
         documents = response.get("documents", [])
@@ -369,11 +373,13 @@ def _render_import_knodes(model_key: str, agent_id: str, module_root: str) -> No
                 st.error(f"Error loading file: {e}")
 
         if data_to_import:
-            if call_action_walker_exec(
-                agent_id,
-                module_root,
-                "import_knodes",
-                {"data": data_to_import, "with_embeddings": with_embeddings},
+            if call_api(
+                endpoint="action/walker/typesense_vector_store_action/import_knodes",
+                json_data={
+                    "agent_id": agent_id,
+                    "data": data_to_import,
+                    "with_embeddings": with_embeddings,
+                },
             ):
                 st.success("Agent knode imported successfully")
             else:
@@ -410,9 +416,13 @@ def _render_export_knodes(model_key: str, agent_id: str, module_root: str) -> No
             "as_json": as_json,
             "with_embeddings": with_embeddings,
             "with_ids": with_ids,
+            "agent_id": agent_id,
         }
 
-        result = call_action_walker_exec(agent_id, module_root, "export_knodes", params)
+        result = call_api(
+            endpoint="action/walker/typesense_vector_store_action/export_knodes",
+            json_data=params,
+        )
 
         if result:
             st.success("Agent memory exported successfully!")
@@ -478,7 +488,10 @@ def _render_purge_collection(model_key: str, agent_id: str, module_root: str) ->
                 type="primary",
                 key=f"{model_key}_btn_confirm_purge",
             ):
-                if call_action_walker_exec(agent_id, module_root, "delete_collection"):
+                if call_api(
+                    endpoint="action/walker/typesense_vector_store_action/delete_collection",
+                    json_data={"agent_id": agent_id},
+                ):
                     st.success("Collection purged successfully")
                     st.session_state[model_key]["page"] = 1
                 else:
@@ -505,8 +518,10 @@ def call_add_texts(
     Returns:
         Response dictionary from the walker
     """
-    args = {"texts": texts, "metadatas": metadatas}
-    return call_action_walker_exec(agent_id, module_root, "add_texts", args)
+    args = {"texts": texts, "metadatas": metadatas, "agent_id": agent_id}
+    return call_api(
+        endpoint="action/walker/typesense_vector_store_action/add_texts", json_data=args
+    )
 
 
 def call_delete_document(
@@ -522,8 +537,11 @@ def call_delete_document(
     Returns:
         Response dictionary from the walker
     """
-    args = {"id": doc_id}
-    return call_action_walker_exec(agent_id, module_root, "delete_document", args)
+    args = {"id": doc_id, "agent_id": agent_id}
+    return call_api(
+        endpoint="action/walker/typesense_vector_store_action/delete_document",
+        json_data=args,
+    )
 
 
 def call_update_document(
@@ -541,4 +559,7 @@ def call_update_document(
         Response dictionary from the walker
     """
     args = {"id": doc_id, "data": data}
-    return call_action_walker_exec(agent_id, module_root, "update_document", args)
+    return call_api(
+        endpoint="action/walker/typesense_vector_store_action/update_document",
+        json_data=args,
+    )

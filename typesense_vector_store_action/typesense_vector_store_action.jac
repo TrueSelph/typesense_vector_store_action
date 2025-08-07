@@ -1,18 +1,18 @@
-import:py os;
-import:py json;
-import:py yaml;
-import:py logging;
-import:py traceback;
-import:py typesense;
-import:py from typing { Any }
-import:py from .modules.langchain_typesense { Typesense }
-import:py from langchain_openai { OpenAIEmbeddings }
-import:py from langchain_core.vectorstores.base { VectorStore }
-import:py from langchain_core.documents.base { Document }
-import:py from logging { Logger }
-import:jac from jivas.agent.action.vector_store_action { VectorStoreAction }
+import os;
+import json;
+import yaml;
+import logging;
+import traceback;
+import typesense;
+import from typing { Any }
+import from .modules.langchain_typesense { Typesense }
+import from langchain_openai { OpenAIEmbeddings }
+import from langchain_core.vectorstores.base { VectorStore }
+import from langchain_core.documents.base { Document }
+import from logging { Logger }
+import from jivas.agent.action.vector_store_action { VectorStoreAction }
 
-node TypesenseVectorStoreAction :VectorStoreAction: {
+node TypesenseVectorStoreAction(VectorStoreAction) {
     # Action for managing a Typesense vector store
 
     static has logger:Logger = logging.getLogger(__name__);
@@ -24,19 +24,19 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
     has collection_name:str = "";
     has vector_dims:int = 1024;  # Default dimensions for embedding model
 
-    can on_register() {
+    def on_register() {
         if not self.collection_name {
             self.collection_name = self.get_agent().id;
         }
     }
 
-    can on_enable() {
+    def on_enable() {
         if not self.collection_name {
             self.collection_name = self.get_agent().id;
         }
     }
 
-    can get_client() -> Union[typesense.Client, None] {
+    def get_client() -> Union[typesense.Client, None] {
         try {
             required = [self.host, self.port, self.protocol, self.api_key];
             if not all(required) {
@@ -57,7 +57,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         }
     }
 
-    can get_collection(collection_name: str) -> Union[typesense.collection.Collection, None] {
+    def get_collection(collection_name: str) -> Union[typesense.collection.Collection, None] {
 
         try {
             client = self.get_client();
@@ -87,7 +87,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         return None;
     }
 
-    can get_vectorstore() -> Union[Typesense, None] {
+    def get_vectorstore() -> Union[Typesense, None] {
         try {
             if not (embedding := self.get_embedding_model()) {
                 raise ValueError("Embedding model unavailable");
@@ -109,7 +109,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         return None;
     }
 
-    can list_documents(page:int=1, per_page:int=10, with_embeddings:bool=False) -> dict {
+    def list_documents(page:int=1, per_page:int=10, with_embeddings:bool=False) -> dict {
         try {
             if collection := self.get_collection(self.collection_name) {
                 query = {
@@ -142,7 +142,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         };
     }
 
-    can get_document(id:str) -> Union[dict, None] {
+    def get_document(id:str) -> Union[dict, None] {
         try {
             if collection := self.get_collection(self.collection_name) {
                 document = collection.documents[id].retrieve();
@@ -157,7 +157,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         return None;
     }
 
-    can metadata_search(metadata:dict, k:int=10, **kwargs:Any) -> List[Document] {
+    def metadata_search(metadata:dict, k:int=10, **kwargs:Any) -> List[Document] {
         try {
             filter_str = " && ".join([f"metadata.{k}:={v}" for (k,v) in metadata.items()]);
             return self.similarity_search(query="*", k=k, filter=filter_str);
@@ -167,7 +167,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         }
     }
 
-    can update_document(id:str, data:dict) -> Union[dict, None] {
+    def update_document(id:str, data:dict) -> Union[dict, None] {
         try {
             if collection := self.get_collection(self.collection_name) {
                 return collection.documents[id].update(data);
@@ -178,7 +178,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         return None;
     }
 
-    can delete_document(id:str) -> Union[dict, None] {
+    def delete_document(id:str) -> Union[dict, None] {
         try {
             if collection := self.get_collection(self.collection_name) {
                 return collection.documents[id].delete();
@@ -189,7 +189,7 @@ node TypesenseVectorStoreAction :VectorStoreAction: {
         return None;
     }
 
-    can delete_collection() -> bool {
+    def delete_collection() -> bool {
         try {
             if collection := self.get_collection(self.collection_name) {
                 result = collection.delete();

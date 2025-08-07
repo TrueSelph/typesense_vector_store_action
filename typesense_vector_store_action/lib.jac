@@ -1,9 +1,11 @@
-include:jac typesense_vector_store_action;
-include:jac add_texts;
-include:jac list_documents;
-include:jac delete_document;
-include:jac get_document;
-include:jac update_document;
-include:jac import_knodes;
-include:jac export_knodes;
-include:jac delete_collection;
+import from actions.jivas.typesense_vector_store_action {
+    typesense_vector_store_action,
+    add_texts,
+    list_documents,
+    delete_document,
+    get_document,
+    update_document,
+    import_knodes,
+    export_knodes,
+    delete_collection
+}
