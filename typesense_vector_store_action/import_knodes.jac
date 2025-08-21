@@ -9,10 +9,12 @@ import from jivas.agent.action.agent_graph_walker { agent_graph_walker }
 
 
 walker import_knodes(agent_graph_walker) {
-    has data:list = [];
+    has data:str = "";
     has response:bool = False;
     has with_embeddings:bool = False;
     has reporting:bool = True;
+
+    static has logger:Logger = logging.getLogger(__name__);
 
     class __specs__ {
         static has private: bool = False;
