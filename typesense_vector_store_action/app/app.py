@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 import streamlit as st
 import yaml
-from jvclient.lib.utils import call_api, jac_yaml_dumper
+from jvclient.lib.utils import call_api, get_reports_payload, jac_yaml_dumper
 from jvclient.lib.widgets import app_controls, app_header, app_update_action
 from streamlit_router import StreamlitRouter
 
@@ -57,9 +57,10 @@ def render(
         json_data=params,
     )
 
-    if response:
-        documents = response.get("documents", [])
-        total_docs = response.get("total", 0)
+    if response and response.status_code == 200:
+        result = get_reports_payload(response)
+        documents = result.get("documents", [])
+        total_docs = result.get("total", 0)
 
         if documents:
             render_paginated_documents(
@@ -373,14 +374,15 @@ def _render_import_knodes(model_key: str, agent_id: str, module_root: str) -> No
                 st.error(f"Error loading file: {e}")
 
         if data_to_import:
-            if call_api(
+            result = call_api(
                 endpoint="action/walker/typesense_vector_store_action/import_knodes",
                 json_data={
                     "agent_id": agent_id,
-                    "data": data_to_import,
+                    "data": str(data_to_import),
                     "with_embeddings": with_embeddings,
                 },
-            ):
+            )
+            if result:
                 st.success("Agent knode imported successfully")
             else:
                 st.error("Failed to import knodes. Ensure valid YAML/JSON format.")
@@ -424,19 +426,20 @@ def _render_export_knodes(model_key: str, agent_id: str, module_root: str) -> No
             json_data=params,
         )
 
-        if result:
+        if result and result.status_code == 200:
+            result = get_reports_payload(result)
             st.success("Agent memory exported successfully!")
             if as_json:
-                json_data = json.dumps(result, indent=4)
-                json_file = BytesIO(json_data.encode("utf-8"))
+                # json_data = json.dumps(result, indent=4)
+                # json_file = BytesIO(json_data.encode("utf-8"))
                 st.download_button(
                     label="Download JSON File",
-                    data=json_file,
+                    data=result,
                     file_name="exported_knodes.json",
                     mime="application/json",
                     key="download_json",
                 )
-                st.json(result)
+
             else:
                 knode_entries = jac_yaml_dumper(data=result, indent=2, sort_keys=False)
                 yaml_file = BytesIO(knode_entries.encode("utf-8"))
@@ -447,7 +450,6 @@ def _render_export_knodes(model_key: str, agent_id: str, module_root: str) -> No
                     mime="application/x-yaml",
                     key="download_yaml",
                 )
-                st.code(knode_entries, language="yaml")
         else:
             st.error("Failed to export knodes. Please check your inputs.")
 
@@ -519,9 +521,13 @@ def call_add_texts(
         Response dictionary from the walker
     """
     args = {"texts": texts, "metadatas": metadatas, "agent_id": agent_id}
-    return call_api(
+    result = call_api(
         endpoint="action/walker/typesense_vector_store_action/add_texts", json_data=args
     )
+    if result and result.status_code == 200:
+        return get_reports_payload(result)
+
+    return {}
 
 
 def call_delete_document(
@@ -538,10 +544,15 @@ def call_delete_document(
         Response dictionary from the walker
     """
     args = {"id": doc_id, "agent_id": agent_id}
-    return call_api(
+    result = call_api(
         endpoint="action/walker/typesense_vector_store_action/delete_document",
         json_data=args,
     )
+
+    if result and result.status_code == 200:
+        return get_reports_payload(result)
+
+    return {}
 
 
 def call_update_document(
@@ -559,7 +570,12 @@ def call_update_document(
         Response dictionary from the walker
     """
     args = {"id": doc_id, "data": data}
-    return call_api(
+    result = call_api(
         endpoint="action/walker/typesense_vector_store_action/update_document",
         json_data=args,
     )
+
+    if result and result.status_code == 200:
+        return get_reports_payload(result)
+
+    return {}

@@ -13,3 +13,6 @@
 
 ## 0.1.0
 - Updated to support Jivas 2.1.0
+
+## 0.1.1
+- Fixed Import and export bugs
