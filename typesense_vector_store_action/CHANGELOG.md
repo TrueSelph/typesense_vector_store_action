@@ -16,3 +16,6 @@
 
 ## 0.1.1
 - Fixed Import and export bugs
+
+## 0.1.2
+- Fixed update_document bug

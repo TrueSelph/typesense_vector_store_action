@@ -569,7 +569,7 @@ def call_update_document(
     Returns:
         Response dictionary from the walker
     """
-    args = {"id": doc_id, "data": data}
+    args = {"id": doc_id, "data": data, "agent_id": agent_id}
     result = call_api(
         endpoint="action/walker/typesense_vector_store_action/update_document",
         json_data=args,
