@@ -19,3 +19,4 @@
 
 ## 0.1.2
 - Fixed update_document bug
+- Fix import bug
