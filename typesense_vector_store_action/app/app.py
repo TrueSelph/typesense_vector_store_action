@@ -365,7 +365,7 @@ def _render_import_knodes(model_key: str, agent_id: str, module_root: str) -> No
     if st.button("Import", key=f"{model_key}_btn_import_knodes"):
         if uploaded_file:
             try:
-                file_content = uploaded_file.read().decode("utf-8")
+                file_content = uploaded_file.read().decode("utf-8", errors="replace")
                 if uploaded_file.type == "application/json":
                     data_to_import = json.loads(file_content)
                 else:
@@ -378,7 +378,7 @@ def _render_import_knodes(model_key: str, agent_id: str, module_root: str) -> No
                 endpoint="action/walker/typesense_vector_store_action/import_knodes",
                 json_data={
                     "agent_id": agent_id,
-                    "data": str(data_to_import),
+                    "data": json.dumps(data_to_import, ensure_ascii=False),
                     "with_embeddings": with_embeddings,
                 },
             )
@@ -569,7 +569,7 @@ def call_update_document(
     Returns:
         Response dictionary from the walker
     """
-    args = {"id": doc_id, "data": data}
+    args = {"id": doc_id, "data": data, "agent_id": agent_id}
     result = call_api(
         endpoint="action/walker/typesense_vector_store_action/update_document",
         json_data=args,

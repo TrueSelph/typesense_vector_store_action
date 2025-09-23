@@ -2,7 +2,7 @@ package:
   name: jivas/typesense_vector_store_action
   author: V75 Inc.
   archetype: TypesenseVectorStoreAction
-  version: 0.1.1
+  version: 0.1.2
   meta:
     title: Typesense Vector Store Action
     description: Integrates with typesense vector database for retrieval augmented generation tasks
