@@ -57,6 +57,7 @@ class Typesense(VectorStore):
         *,
         typesense_collection_name: Optional[str] = None,
         text_key: str = "text",
+        per_page: int = 100,
     ) -> None:
         """Initialize with Typesense client."""
         try:
@@ -77,6 +78,7 @@ class Typesense(VectorStore):
             typesense_collection_name or f"langchain-{str(uuid.uuid4())}"
         )
         self._text_key = text_key
+        self._per_page = per_page
 
     @property
     def _collection(self) -> Collection:
@@ -168,8 +170,9 @@ class Typesense(VectorStore):
     def similarity_search_with_score(
         self,
         query: str,
-        k: int = 10,
+        k: int = 0,
         filter: Optional[str] = "",
+        kwargs: Optional[dict] = None,
     ) -> List[Tuple[Document, float]]:
         """Return typesense documents most similar to query, along with scores.
 
@@ -187,7 +190,11 @@ class Typesense(VectorStore):
             "vector_query": f"vec:([{','.join(embedded_query)}], k:{k})",
             "filter_by": filter,
             "collection": self._typesense_collection_name,
+            "per_page": self._per_page,
         }
+        if kwargs:
+            query_obj.update(kwargs)
+
         docs = []
         response = self._typesense_client.multi_search.perform(
             {"searches": [query_obj]}, {}
@@ -222,7 +229,9 @@ class Typesense(VectorStore):
         Returns:
             List of Documents most similar to the query.
         """
-        docs_and_score = self.similarity_search_with_score(query, k=k, filter=filter)
+        docs_and_score = self.similarity_search_with_score(
+            query, k=k, filter=filter, **kwargs
+        )
         return [doc for doc, _ in docs_and_score]
 
     @classmethod
