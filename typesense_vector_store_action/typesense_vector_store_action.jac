@@ -162,7 +162,7 @@ node TypesenseVectorStoreAction(VectorStoreAction) {
     def metadata_search(metadata:dict, k:int=10, **kwargs:Any) -> List[Document] {
         try {
             filter_str = " && ".join([f"metadata.{k}:={v}" for (k,v) in metadata.items()]);
-            return self.similarity_search(query="*", k=k, filter=filter_str);
+            return self.similarity_search(query="*", k=k, filter=filter_str, **kwargs);
         } except Exception as e {
             self.logger.error(f"Metadata search failed: {str(e)}");
             return [];
