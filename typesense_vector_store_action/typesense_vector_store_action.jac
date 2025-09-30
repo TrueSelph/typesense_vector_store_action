@@ -23,6 +23,7 @@ node TypesenseVectorStoreAction(VectorStoreAction) {
     has connection_timeout:int = int(os.environ.get('TYPESENSE_CONNECTION_TIMEOUT_SECONDS','2'));
     has collection_name:str = "";
     has vector_dims:int = 1024;  # Default dimensions for embedding model
+    has per_page:int = 100;
 
     def on_register() {
         if not self.collection_name {
@@ -100,7 +101,8 @@ node TypesenseVectorStoreAction(VectorStoreAction) {
                     typesense_client=client,
                     embedding=embedding,
                     typesense_collection_name=self.collection_name,
-                    text_key="text"
+                    text_key="text",
+                    per_page=self.per_page
                 );
             }
         } except Exception as e {
@@ -160,7 +162,7 @@ node TypesenseVectorStoreAction(VectorStoreAction) {
     def metadata_search(metadata:dict, k:int=10, **kwargs:Any) -> List[Document] {
         try {
             filter_str = " && ".join([f"metadata.{k}:={v}" for (k,v) in metadata.items()]);
-            return self.similarity_search(query="*", k=k, filter=filter_str);
+            return self.similarity_search(query="*", k=k, filter=filter_str, **kwargs);
         } except Exception as e {
             self.logger.error(f"Metadata search failed: {str(e)}");
             return [];

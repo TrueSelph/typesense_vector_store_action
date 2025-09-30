@@ -20,3 +20,7 @@
 ## 0.1.2
 - Fixed update_document bug
 - Fix import bug
+
+## 0.1.3
+- Added kwargs parameter to similarity_search_with_score
+- Added per_page parameter to vector_store_action
