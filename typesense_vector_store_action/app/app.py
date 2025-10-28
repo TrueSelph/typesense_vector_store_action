@@ -370,6 +370,8 @@ def _render_import_knodes(model_key: str, agent_id: str, module_root: str) -> No
                     data_to_import = json.loads(file_content)
                 else:
                     data_to_import = yaml.safe_load(file_content)
+
+                data_to_import = json.dumps(data_to_import, ensure_ascii=False)
             except Exception as e:
                 st.error(f"Error loading file: {e}")
 
@@ -378,9 +380,10 @@ def _render_import_knodes(model_key: str, agent_id: str, module_root: str) -> No
                 endpoint="action/walker/typesense_vector_store_action/import_knodes",
                 json_data={
                     "agent_id": agent_id,
-                    "data": json.dumps(data_to_import, ensure_ascii=False),
+                    "data": data_to_import,
                     "with_embeddings": with_embeddings,
                 },
+                timeout=120,
             )
             if result:
                 st.success("Agent knode imported successfully")

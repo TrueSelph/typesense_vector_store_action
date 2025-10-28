@@ -24,3 +24,6 @@
 ## 0.1.3
 - Added kwargs parameter to similarity_search_with_score
 - Added per_page parameter to vector_store_action
+
+## 0.1.4
+- Locked langchain-core to 0.3.79
