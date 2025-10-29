@@ -9,6 +9,7 @@ walker list_documents(agent_graph_walker) {
 
     has page:int = 1;
     has per_page:int = 10;
+    has filter_by:str = "";
     has response:dict = {};
     has reporting:bool = True;
 
@@ -28,7 +29,8 @@ walker list_documents(agent_graph_walker) {
     can on_action with Action entry {
         self.response = here.list_documents(
             page=self.page,
-            per_page=self.per_page
+            per_page=self.per_page,
+            filter_by=self.filter_by
         );
 
         if self.reporting {

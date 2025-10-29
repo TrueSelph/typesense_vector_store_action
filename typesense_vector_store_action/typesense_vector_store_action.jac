@@ -111,13 +111,14 @@ node TypesenseVectorStoreAction(VectorStoreAction) {
         return None;
     }
 
-    def list_documents(page:int=1, per_page:int=10, with_embeddings:bool=False) -> dict {
+    def list_documents(page:int=1, per_page:int=10, with_embeddings:bool=False, filter_by:str="") -> dict {
         try {
             if collection := self.get_collection(self.collection_name) {
                 query = {
                     'q': '*',
                     'per_page': per_page,
-                    'page': page
+                    'page': page,
+                    'filter_by': filter_by
                 };
 
                 if not with_embeddings {

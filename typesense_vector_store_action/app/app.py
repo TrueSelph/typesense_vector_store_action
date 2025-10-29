@@ -47,11 +47,20 @@ def render(
     if list_key not in st.session_state:
         st.session_state[list_key] = {}
 
+    filter_by = st.text_input(
+        label="Filter by",
+        value=st.session_state[list_key].get("filter_by", ""),
+        key=f"{list_key}_filter_by",
+        placeholder="e.g., metadata.job_id:=123 && metadata.page:=[1,2,3]",
+    ).strip()
+
     params = {
         "page": st.session_state[list_key].get("page", 1),
         "per_page": st.session_state[list_key].get("per_page", 10),
+        "filter_by": filter_by,
         "agent_id": agent_id,
     }
+
     response = call_api(
         endpoint="action/walker/typesense_vector_store_action/list_documents",
         json_data=params,
