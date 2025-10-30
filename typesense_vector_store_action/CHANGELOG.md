@@ -27,3 +27,6 @@
 
 ## 0.1.4
 - Locked langchain-core to 0.3.79
+
+## 0.1.5
+- Added filter parameter to vector_store_action
